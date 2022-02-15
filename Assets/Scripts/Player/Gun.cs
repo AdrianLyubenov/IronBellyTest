@@ -8,7 +8,7 @@ namespace Player.Gun
         [SerializeField]
         private Transform bulletSpawnPoint;
         
-        void Update()
+        private void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {

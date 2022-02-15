@@ -43,7 +43,7 @@ public class UiManager : MonoBehaviour
         scoreText.text = String.Format("Score: {0}", score);
     }
     
-    private void OnCubeDestroyed(Cube arg0)
+    private void OnCubeDestroyed(Cube cube)
     {
         UpdateActiveCubesText(CubesPoolManager.instance.activeObjects.Count);
     }

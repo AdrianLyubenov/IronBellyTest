@@ -1,3 +1,4 @@
+using System.Linq;
 using Events;
 using UnityEngine.Pool;
 
@@ -19,11 +20,10 @@ public class BulletsPoolManager : PoolManager<Bullet>
 
     protected override void OnPoolFillComplete()
     {
-        // We dont need active bullets when game starts
-        foreach (var bullet in activeObjects)
+        // We don't need active bullets when game starts
+        foreach (var bullet in activeObjects.Where(bullet => bullet.gameObject.activeSelf))
         {
-            if(bullet.gameObject.activeSelf)
-                pool.Release(bullet);
+            pool.Release(bullet);
         }
     }
 

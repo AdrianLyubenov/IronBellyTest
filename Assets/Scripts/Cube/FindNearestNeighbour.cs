@@ -10,9 +10,10 @@ using UnityEngine;
         void Update()
         {
             if (CubesPoolManager.instance.ActiveObjects.Count <= 1)
-                return;
-            else
+            {
                 ClearPoints();
+                return;
+            }
 
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, FindClosestCube(CubesPoolManager.instance.ActiveObjects).transform.position);
@@ -21,7 +22,7 @@ using UnityEngine;
         Cube FindClosestCube(List<Cube> targets)
         {
             Vector3 position = transform.position;
-            return targets.OrderBy(o => (o.transform.position - position).sqrMagnitude)
+            return targets.OrderBy(cube => (cube.transform.position - position).sqrMagnitude)
                 .ElementAt(1); // Returns second element because first element is always this gameObject
         }
 

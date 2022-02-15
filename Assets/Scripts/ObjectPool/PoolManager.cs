@@ -7,22 +7,23 @@ using UnityEngine.Pool;
 
     public class PoolManager<T> : MonoBehaviour where T : Object
     {
-        public int CurrentActiveObjectsCount { get { return pool.CountActive; } }
+        public List<T> activeObjects = new List<T>();
         public List<T> ActiveObjects{ get { return activeObjects; } }
-        internal ObjectPool<T> pool;
+        public ObjectPool<T> pool;
         
-        internal readonly List<T> instantiatedObjects = new List<T>();
-        internal List<T> activeObjects = new List<T>();
+        protected int CurrentActiveObjectsCount { get { return pool.CountActive; } }
+        protected readonly List<T> instantiatedObjects = new List<T>();
         
         [SerializeField]
-        internal int defaultSpawnAmount;
+        protected int defaultSpawnAmount;
         [SerializeField]
-        internal T objectPrefab;
+        protected T objectPrefab;
         [SerializeField]
-        internal Transform objectsParent;
+        protected Transform objectsParent;
         
-        internal IEnumerator CoroutineFillPool(int count)
+        protected IEnumerator CoroutineFillPool(int count)
         {
+            // Coroutine because of possible instantiation 
             yield return null;
 
             while (CurrentActiveObjectsCount < count)
@@ -34,7 +35,7 @@ using UnityEngine.Pool;
             OnPoolFillComplete();
         }
 
-        internal void DeactivateObjects(int count)
+        protected void DrainPull(int count)
         {
             int realesdCubes = 0;
             foreach (var cube in activeObjects)
@@ -47,7 +48,7 @@ using UnityEngine.Pool;
 
                 if (realesdCubes == count)
                 {
-                    OnPoolClearComplete();
+                    OnPoolDrainComplete();
                     return;
                 }
             }
@@ -55,11 +56,17 @@ using UnityEngine.Pool;
 
         protected virtual void OnPoolFillComplete()
         {
-            activeObjects = instantiatedObjects.Where(x => x.GameObject().activeSelf).ToList();
+            UpdateActiveObjects();
         }
         
-        protected virtual void OnPoolClearComplete()
+        protected virtual void OnPoolDrainComplete()
         {
-            activeObjects = instantiatedObjects.Where(x => x.GameObject().activeSelf).ToList();
+            UpdateActiveObjects();
         }
+
+        private void UpdateActiveObjects()
+        {
+            activeObjects = instantiatedObjects.Where(genericObject => genericObject.GameObject().activeSelf).ToList();
+        }
+        
     }

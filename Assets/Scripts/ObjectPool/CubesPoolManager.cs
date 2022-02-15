@@ -9,7 +9,7 @@ namespace PoolManager
 
       private void Awake()
       {
-         pool = new ObjectPool<Cube>(CreateCube, OnTakeCubeFromPool, OnReturnCubeToPool);
+         pool = new ObjectPool<Cube>(OnCreateCube, OnTakeCubeFromPool, OnReturnCubeToPool);
          instance = this;
       }
 
@@ -17,19 +17,19 @@ namespace PoolManager
       {
          StartCoroutine(CoroutineFillPool(defaultSpawnAmount));
          EventsFactory.instance.OnActiveObjectsCountChanged.Invoke(CurrentActiveObjectsCount); // Updating the UI about default spawned Cubes
-         EventsFactory.instance.OnActiveObjectsCountChanged.AddListener(OnActiveCubeCountChanged);
+         EventsFactory.instance.OnActiveObjectsCountChanged.AddListener(OnActiveCubesCountChanged);
          EventsFactory.instance.OnCubeDestroyed.AddListener(OnCubeDestroyed);
       }
 
-      internal void OnActiveCubeCountChanged(int count)
+      private void OnActiveCubesCountChanged(int count)
       {
          if (count > CurrentActiveObjectsCount)
             StartCoroutine(CoroutineFillPool(count));
          else
-            DeactivateObjects(CurrentActiveObjectsCount - count);
+            DrainPull(CurrentActiveObjectsCount - count);
       }
       
-      private Cube CreateCube()
+      private Cube OnCreateCube()
       {
          Cube cube = Instantiate(objectPrefab, objectsParent);
          cube.SetPool(pool);
@@ -58,7 +58,7 @@ namespace PoolManager
       
       private void OnDestroy()
       {
-         EventsFactory.instance.OnActiveObjectsCountChanged.RemoveListener(OnActiveCubeCountChanged);
+         EventsFactory.instance.OnActiveObjectsCountChanged.RemoveListener(OnActiveCubesCountChanged);
       }
    }
 }
